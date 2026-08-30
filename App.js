@@ -2,14 +2,17 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Button, ScrollView } from 'react-native';
 import { useState } from 'react';
 
+import KayitSatiri from './components/KayitSatiri';
+import HizliButonlar from './components/HizliButonlar';
+import Ilerleme from './components/Ilerleme';
+import SifirlaButon from './components/SifirlaButon';
+
 export default function App() {
   const [kayitlar, setKayitlar] = useState([]);
   const [hedef, setHedef] = useState(2500);
 
-  // Toplam miktarı hesaplama — computed value
   const toplam = kayitlar.reduce((acc, k) => acc + k.miktar, 0);
 
-  // Yeni kayıt ekleme fonksiyonu
   function kayitEkle(miktar) {
     const now = new Date();
     const saat =
@@ -17,7 +20,7 @@ export default function App() {
       String(now.getMinutes()).padStart(2, '0');
 
     const yeniKayit = {
-      id: Date.now(),   // benzersiz id — mevcut zamanı milisaniye olarak
+      id: Date.now(),
       miktar: miktar,
       saat: saat,
     };
@@ -33,18 +36,9 @@ export default function App() {
     <View style={styles.container}>
       <Text style={styles.baslik}>Su Hatırlatıcı</Text>
 
-      <Text style={styles.miktar}>{toplam} ml</Text>
-      <Text style={styles.hedef}>Hedef: {hedef} ml</Text>
+      <Ilerleme toplam={toplam} hedef={hedef} />
 
-      {toplam >= hedef && (
-        <Text style={styles.basari}>Hedefe ulaştın!</Text>
-      )}
-
-      <View style={styles.butonlar}>
-        <Button title="+150 ml" onPress={() => kayitEkle(150)} />
-        <Button title="+250 ml" onPress={() => kayitEkle(250)} />
-        <Button title="+500 ml" onPress={() => kayitEkle(500)} />
-      </View>
+      <HizliButonlar onEkle={kayitEkle} />
 
       <Text style={styles.altBaslik}>Bugünkü kayıtlar:</Text>
 
@@ -53,15 +47,15 @@ export default function App() {
           <Text style={styles.bosMesaj}>Henüz kayıt yok.</Text>
         )}
         {kayitlar.map(kayit => (
-          <View key={kayit.id} style={styles.kayitSatir}>
-            <Text style={styles.kayitMiktar}>{kayit.miktar} ml</Text>
-            <Text style={styles.kayitSaat}>{kayit.saat}</Text>
-          </View>
+          <KayitSatiri
+            key={kayit.id}
+            miktar={kayit.miktar}
+            saat={kayit.saat}
+          />
         ))}
       </ScrollView>
 
-      <Button title="Sıfırla" onPress={sifirla} color="red" />
-
+      <SifirlaButon onSifirla={sifirla} />
       <StatusBar style="auto" />
     </View>
   );
@@ -81,33 +75,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
-  miktar: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    color: '#1D9E75',
-    textAlign: 'center',
-  },
-  hedef: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  basari: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#0F6E56',
-    backgroundColor: '#E1F5EE',
-    padding: 10,
-    borderRadius: 8,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  butonlar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 20,
-  },
   altBaslik: {
     fontSize: 16,
     fontWeight: 'bold',
@@ -121,19 +88,5 @@ const styles = StyleSheet.create({
     color: '#999',
     textAlign: 'center',
     padding: 20,
-  },
-  kayitSatir: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 10,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#ddd',
-  },
-  kayitMiktar: {
-    fontSize: 15,
-  },
-  kayitSaat: {
-    fontSize: 13,
-    color: '#666',
   },
 });
